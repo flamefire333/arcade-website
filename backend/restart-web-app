@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo docker-compose -f go-app-compose.yaml up -d --force-recreate --build
