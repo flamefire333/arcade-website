@@ -54,7 +54,8 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Serving %s from static.\n", path)
 	// otherwise, use http.FileServer to serve the static dir
-	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+	// http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+	http.ServeFile(w, r, path)
 }
 
 func main() {
