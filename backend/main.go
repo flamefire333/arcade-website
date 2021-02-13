@@ -67,7 +67,7 @@ func main() {
 	addChatHandlers(r)
 	addMafiaHandlers(r)
 
-	spa := spaHandler{staticPath: "", indexPath: "index.html"}
+	spa := spaHandler{staticPath: "../", indexPath: "index.html"}
 	r.PathPrefix("/").Handler(spa)
 
 	http.ListenAndServe(":80", r)
