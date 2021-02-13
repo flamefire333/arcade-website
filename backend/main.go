@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -32,6 +33,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	log.Printf("Accessing Path %s", path)
 
 	// prepend the path with the path to the static directory
 	path = filepath.Join(h.staticPath, path)
