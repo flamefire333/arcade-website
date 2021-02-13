@@ -1,11 +1,8 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 	"net/http"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -33,7 +30,8 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}*/
-	path := filepath.Clean(r.URL.Path)
+	http.ServeFile(w, r, h.indexPath)
+	/*path := filepath.Clean(r.URL.Path)
 	log.Printf("Path: %s", path)
 
 	// prepend the path with the path to the static directory
@@ -55,7 +53,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// otherwise, use http.FileServer to serve the static dir
-	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)*/
 }
 
 func main() {
