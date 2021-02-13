@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 	"net/http"
 	"path/filepath"
@@ -31,7 +32,12 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}*/
-	http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
+	path, err := filepath.Abs(filepath.Join(h.staticPath, h.indexPath))
+	if err != nil {
+		log.Printf("SPA ERORR: %+v", err)
+	}
+	log.Printf("SPA PATH: " + path)
+	http.ServeFile(w, r, path)
 	/*path := filepath.Clean(r.URL.Path)
 	log.Printf("Path: %s", path)
 
