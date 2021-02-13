@@ -1,41 +1,75 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"math/rand"
 	"net/http"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/gorilla/mux"
 )
 
-var count int = 0
+// spaHandler implements the http.Handler interface, so we can use it
+// to respond to HTTP requests. The path to the static directory and
+// path to the index file within that static directory are used to
+// serve the SPA in the given static directory.
+type spaHandler struct {
+	staticPath string
+	indexPath  string
+}
 
-func request(incoming chan int, outgoing chan int) {
-	for 1 == 1 {
-		requestType := <-incoming
-		if requestType == 0 {
-			count = count + 1
-		} else if requestType == 1 {
-			outgoing <- count
-		}
+// ServeHTTP inspects the URL path to locate a file within the static dir
+// on the SPA handler. If a file is found, it will be served. If not, the
+// file located at the index path on the SPA handler will be served. This
+// is suitable behavior for serving an SPA (single page application).
+func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// get the absolute path to prevent directory traversal
+	/*path, err := filepath.Abs(r.URL.Path)
+		if err != nil {
+	        // if we failed to get the absolute path respond with a 400 bad request
+	        // and stop
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}*/
+	path := filepath.Clean(r.URL.Path)
+	log.Printf("Path: %s", r.URL.Path)
+
+	// prepend the path with the path to the static directory
+	path = filepath.Join(h.staticPath, path)
+
+	// check whether a file exists at the given path
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+
+		// file does not exist, serve index.html
+		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
+		return
+	} else if err != nil {
+		// if we got an error (that wasn't that the file doesn't exist) stating the
+		// file, return a 500 internal server error and stop
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
+	// otherwise, use http.FileServer to serve the static dir
+	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
 func main() {
 	r := mux.NewRouter()
-	sendChannel := make(chan int)
-	receiveChannel := make(chan int)
-	go request(sendChannel, receiveChannel)
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "<h1>This is the homepage</h1>")
-		sendChannel <- 0
-	})
+	rand.Seed(time.Now().UnixNano())
+	initRoles()
+	go chatRequestHandler()
+	go mafiaRequestHandler()
+	go GameRunner()
 
-	r.HandleFunc("/hello/{name}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		title := vars["name"]
-		sendChannel <- 1
-		visit := <-receiveChannel
-		fmt.Fprintf(w, "<h1>Hello, %s! This is visit %d\n</h1>", title, visit)
-	})
+	addChatHandlers(r)
+	addMafiaHandlers(r)
+
+	spa := spaHandler{staticPath: "../frontend/", indexPath: "../frontend/index.html"}
+	r.PathPrefix("/").Handler(spa)
 
 	http.ListenAndServe(":80", r)
 }
