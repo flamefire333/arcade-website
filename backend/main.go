@@ -34,10 +34,11 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}*/
 	path := filepath.Clean(r.URL.Path)
-	log.Printf("Path: %s", r.URL.Path)
+	log.Printf("Path: %s", path)
 
 	// prepend the path with the path to the static directory
 	path = filepath.Join(h.staticPath, path)
+	log.Printf("Full Path: %s", path)
 
 	// check whether a file exists at the given path
 	_, err := os.Stat(path)
@@ -68,7 +69,7 @@ func main() {
 	addChatHandlers(r)
 	addMafiaHandlers(r)
 
-	spa := spaHandler{staticPath: "../frontend/", indexPath: "../frontend/index.html"}
+	spa := spaHandler{staticPath: "../frontend/", indexPath: "index.html"}
 	r.PathPrefix("/").Handler(spa)
 
 	http.ListenAndServe(":80", r)
