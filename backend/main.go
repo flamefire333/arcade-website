@@ -38,7 +38,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("SPA PATH: " + path)
 	//http.ServeFile(w, r, path)
-	http.FileServer(http.Dir("/frontend")).ServeHTTP(w, r)
+	http.ServeFile(w, r, path)
 	/*path := filepath.Clean(r.URL.Path)
 	log.Printf("Path: %s", path)
 
@@ -75,7 +75,7 @@ func main() {
 	addChatHandlers(r)
 	addMafiaHandlers(r)
 
-	spa := spaHandler{staticPath: "frontend", indexPath: "index.html"}
+	spa := spaHandler{staticPath: "/frontend", indexPath: "index.html"}
 	r.PathPrefix("/").Handler(spa)
 
 	http.ListenAndServe(":80", r)
