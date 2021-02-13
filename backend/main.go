@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -25,31 +25,20 @@ type spaHandler struct {
 // is suitable behavior for serving an SPA (single page application).
 func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// get the absolute path to prevent directory traversal
-	/*path, err := filepath.Abs(r.URL.Path)
-		if err != nil {
-	        // if we failed to get the absolute path respond with a 400 bad request
-	        // and stop
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}*/
-	path, err := filepath.Abs(filepath.Join(h.staticPath, h.indexPath))
+	path, err := filepath.Abs(r.URL.Path)
 	if err != nil {
-		log.Printf("SPA ERORR: %+v", err)
+		// if we failed to get the absolute path respond with a 400 bad request
+		// and stop
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
-	log.Printf("SPA PATH: " + path)
-	//http.ServeFile(w, r, path)
-	http.ServeFile(w, r, path)
-	/*path := filepath.Clean(r.URL.Path)
-	log.Printf("Path: %s", path)
 
 	// prepend the path with the path to the static directory
 	path = filepath.Join(h.staticPath, path)
-	log.Printf("Full Path: %s", path)
 
 	// check whether a file exists at the given path
-	_, err := os.Stat(path)
+	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
-
 		// file does not exist, serve index.html
 		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
 		return
@@ -61,7 +50,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// otherwise, use http.FileServer to serve the static dir
-	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)*/
+	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
 func main() {
