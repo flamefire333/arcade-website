@@ -37,7 +37,8 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("SPA ERORR: %+v", err)
 	}
 	log.Printf("SPA PATH: " + path)
-	http.ServeFile(w, r, path)
+	//http.ServeFile(w, r, path)
+	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 	/*path := filepath.Clean(r.URL.Path)
 	log.Printf("Path: %s", path)
 
