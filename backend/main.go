@@ -3,6 +3,7 @@ package main
 import (
 	"math/rand"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -30,7 +31,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}*/
-	http.ServeFile(w, r, h.indexPath)
+	http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
 	/*path := filepath.Clean(r.URL.Path)
 	log.Printf("Path: %s", path)
 
