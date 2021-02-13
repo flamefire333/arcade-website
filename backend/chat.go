@@ -78,7 +78,7 @@ func readMessages(request ChatReadMessageRequest) []Message {
 		base := phaseHolder.messages[request.startIndex:]
 		ret := make([]Message, 0)
 		for _, message := range base {
-			if message.Type == request.chatID || request.chatID == -1 || message.Type == CHAT_ALL {
+			if message.Type == request.chatID || request.chatID == CHAT_DEAD || message.Type == CHAT_ALL {
 				ret = append(ret, message)
 			}
 		}
@@ -94,7 +94,7 @@ func chatRequestHandler() {
 		switch r := request.(type) {
 		case ChatSendMessageRequest:
 			sendMessage(r)
-			readRequest := ChatReadMessageRequest{userID: r.userID, phase: r.phase, startIndex: r.startIndex}
+			readRequest := ChatReadMessageRequest{userID: r.userID, phase: r.phase, startIndex: r.startIndex, chatID: r.chatID}
 			chatOutgoingChannel <- readMessages(readRequest)
 		case ChatReadMessageRequest:
 			chatOutgoingChannel <- readMessages(r)
