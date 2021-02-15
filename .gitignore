@@ -1,4 +1,4 @@
-frontend-source/dist
-frontend-source/.idea
-frontend-source/node_modules
-frontend-source/e2e
+frontend/dist
+frontend/.idea
+frontend/node_modules
+frontend/e2e
