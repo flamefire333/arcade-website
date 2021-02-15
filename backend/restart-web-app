@@ -1,3 +1,5 @@
 #!/bin/bash
 git pull
+cp -r ../frontend/ frontend/
 sudo docker-compose -f go-app-compose.yaml up -d --force-recreate --build
+rm -r frontend/
