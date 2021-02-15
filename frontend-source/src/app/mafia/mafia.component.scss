@@ -1,0 +1,106 @@
+@import '~@angular/material/theming';
+.mafia {
+  display: flex;
+  flex-direction: column;
+}
+
+.mafia-main {
+  display: flex;
+  flex-direction: row;
+}
+
+.mafia-topbar {
+  display: flex;
+  flex-direction: row;
+  height: 25px;
+  border-bottom: solid;
+  border-color: #444444;
+  border-bottom-width: medium;
+}
+
+.role-topbar-item {
+  display: flex;
+  flex-direction: row;
+  padding-right: 10px;
+}
+
+app-chat {
+  border-left: solid;
+  border-right: solid;
+  border-color: #444444;
+  border-left-width: medium;
+}
+
+.mafia-sidebar {
+  height: 100%;
+  width: 20vw;
+  padding: 10px;
+}
+
+.roleButton {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  background-color: #444444;
+}
+
+.startGameButton {
+  width: 100%;
+  background-color: #444444;
+  color: #ffffff;
+}
+
+.disabledStartGameButton {
+  width: 100%;
+  background-color: #333333;
+  color: #888888;
+}
+
+.roleButton img {
+  width: 20px;
+  height: 20px;
+}
+
+.selectedRoleData {
+  display: flex;
+  width: 80px;
+}
+
+select {
+  background-color: #444444;
+  color: #ffffff;
+  width: 100%;
+}
+
+.characterGroupSelect {
+  background-color: #444444;
+}
+
+mat-option {
+  color: #ffffff;
+  background-color: #444444;
+}
+
+.mat-select-panel-wrap {
+  background-color: #ffffff;
+}
+
+textarea {
+  background-color: #444444;
+  width: 100%;
+  height: 100px;
+  padding:3px;
+}
+
+.willArea {
+  width: 100%;
+}
+
+.willFormField {
+  width: 100%;
+}
+
+.panel-item {
+  background-color: #333333;
+  padding: 5px;
+}

@@ -1,0 +1,21 @@
+.dialogue {
+  width: 500px;
+  height: 20px;
+  display: block;
+  overflow: hidden;
+}
+.activeCharacter {
+  position: relative;
+  bottom: 3px;
+}
+.widthChecker {
+  width: auto;
+  white-space: nowrap;
+  position: absolute;
+}
+.tinyHideBox {
+  width: 10px;
+  display: flex;
+  overflow: hidden;
+  visibility: hidden;
+}

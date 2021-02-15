@@ -1,0 +1,18 @@
+.hat {
+  position: absolute;
+  width: 200px;
+  z-index: 1;
+}
+.bean {
+  position: absolute;
+  width: 200px;
+  z-index: 0;
+  top: 35px;
+}
+.container {
+  position: relative;
+  width: 200px;
+}
+img {
+  width: 100%;
+}

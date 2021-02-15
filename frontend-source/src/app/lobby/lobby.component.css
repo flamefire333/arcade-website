@@ -1,0 +1,32 @@
+#lobby {
+  text-align: left;
+  width: 20vh;
+  height: 100%;
+}
+.lobby-table-even {
+  background: #444444;
+}
+.lobby-table-div {
+  display: flex;
+  vertical-align: middle;
+  line-height: normal;
+  font-size: 12pt;
+}
+.lobby-table-active {
+  background-color: #448844;
+}
+.view {
+  display: flex;
+  height: 100%;
+}
+.avatar {
+  width: 30px;
+}
+
+.gray {
+  filter: grayscale(100%);
+}
+
+.status-icon {
+  width: 25px;
+}

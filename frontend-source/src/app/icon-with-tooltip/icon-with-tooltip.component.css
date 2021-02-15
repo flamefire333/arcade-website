@@ -1,0 +1,27 @@
+.selectRoleIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.fancyTooltip {
+  background-color: #555555;
+  position: absolute;
+  width: 200px;
+  top: 0px;
+  padding: 10px;
+  border-style: solid;
+  border-color: #888888;
+  z-index: 5;
+  color:#ffffff;
+}
+
+.fancyTooltip h2 {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.fancyTooltipHolder {
+  position: relative;
+  width: 0px;
+  height: 0px;
+}

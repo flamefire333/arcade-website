@@ -1,0 +1,102 @@
+<div class="mafia">
+  <div class="mafia-topbar">
+    <div class="role-topbar-item" *ngFor="let item of this.activeRoles">
+      <app-icon-with-tooltip
+        *ngIf="!!item.role"
+        [name]="item.role.name"
+        [icon]="item.role.icon"
+        [description]="item.role.description">
+      </app-icon-with-tooltip>
+      {{item.amount}}
+    </div>
+  </div>
+  <div class="mafia-main">
+    <app-lobby [sections]="this.lobbySections" [active]="this.getChatName()"></app-lobby>
+    <app-chat [phase]="this.phase"
+              [username]="this.username"
+              [userID]="this.userID"
+              [characterName]="this.getChatName()"
+              [characterAvatar]="this.getChatAvatar()"
+              [isDead]="!this.isAlive && this.started"
+              [canSend]="!this.isAlive || !this.started || this.isDay || (!this.isDay && this.myRole === 2)">
+    </app-chat>
+    <div class="mafia-sidebar">
+      <div *ngIf="!this.started && isLeader" class="panel-item">
+        <div>
+          <button class="roleButton" (click)="this.addRole(role)" *ngFor="let role of this.roles">
+            <app-icon-with-tooltip [name]="role.name"
+                                   [icon]="role.icon"
+                                   [description]="role.description">
+            </app-icon-with-tooltip>
+          </button>
+        </div>
+        <div>
+          <div class="selectedRoleData" *ngFor="let roleData of this.roleCounts"
+               (click)="this.removeRole(roleData.role)">
+            <app-icon-with-tooltip [name]="roleData.role.name"
+                                   [icon]="roleData.role.icon"
+                                   [description]="roleData.role.description">
+            </app-icon-with-tooltip>
+            {{roleData.count}}
+          </div>
+        </div>
+        <mat-form-field appearance="fill" class="selection">
+          <mat-label>Character Set</mat-label>
+          <mat-select [(value)]="this.characterGroupChoice">
+            <mat-option
+              *ngFor="let charGroup of this.characterGroups"
+              [value]="charGroup.id">
+              {{charGroup.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-button
+                [class.startGameButton]="this.canStartGame()"
+                [class.disabledStartGameButton]="!this.canStartGame()"
+                [disabled]="!this.canStartGame()"
+                (click)="this.startGame()">Start Game
+        </button>
+      </div>
+      <h2 *ngIf="this.started">{{this.isDay ? 'Day' : 'Night'}} {{this.dayCount}}</h2>
+      <div *ngIf="this.started && !this.isDay" class="willArea">
+        <label>Write a Will</label>
+        <mat-form-field class="willFormField">
+          <mat-label>Write some words for when you die</mat-label>
+          <textarea (keyup)="this.willSubject.next(will.value)" matInput placeholder="I cry for I die" #will></textarea>
+        </mat-form-field>
+      </div>
+      <div class="panel-item mat-elevation-z8" *ngIf="this.started && this.isAlive && this.votes.length > 0">
+        <h2>{{this.votingTitle}}</h2>
+        <h3>Current Choices</h3>
+        <div>
+          <table>
+            <tr *ngFor="let dayVote of this.votes">
+              <td>
+                {{dayVote.name}}:
+              </td>
+              <td>
+                {{dayVote.vote}}
+              </td>
+            </tr>
+          </table>
+        </div>
+        <mat-form-field appearance="fill" class="selection">
+          <mat-label>Choose who to vote for</mat-label>
+          <mat-select [(value)]="this.voteChoice">
+            <mat-option
+              [value]="'No One'"
+              (click)="this.sendDayVote('No One', this.voteBarrierID)">
+              No One
+            </mat-option>
+            <mat-option
+              *ngFor="let char of this.aliveCharacterNames"
+              [value]="char"
+              (click)="this.sendDayVote(char, this.voteBarrierID)">
+              {{char}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</div>

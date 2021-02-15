@@ -1,0 +1,16 @@
+<div class="container">
+  <app-bean-preview [colorID]="this.colorID" [hatID]="this.hatID" scale="0.5"></app-bean-preview>
+  <div>
+    Name: {{this.characterName}}
+  </div>
+  <div>
+    Color: {{this.colorID}}
+  </div>
+  <div>
+    Hat: {{this.hatID}}
+  </div>
+  <div>
+    <button mat-raised-button color="primary" [disabled]="this.startingNewRound" (click)="this.startRound()">Roll New Round</button>
+  </div>
+</div>
+

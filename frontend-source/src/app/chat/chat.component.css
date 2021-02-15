@@ -1,0 +1,80 @@
+.chat-table {
+  width: 60vw;
+  overflow-y: scroll;
+  max-height: 75vh;
+  height: 80vh;
+  display:flex;
+  flex-direction: column-reverse;
+}
+
+.chat-table tr td{
+  line-height: 30px;
+}
+
+.sender {
+  font-weight: bold;
+  height: 20px;
+}
+
+.dead {
+  color: #dd7777;
+}
+
+.sender-avatar {
+  padding-top: 10px;
+  width: 35px;
+}
+
+.sender-avatar-holder {
+  vertical-align: top;
+}
+
+.emote {
+  max-width: 20px;
+  max-height: 20px;
+}
+
+body {
+  background-color: #222222;
+  color: #ffffff;
+}
+
+.chat-input {
+  width: 100%;
+  height: 20px;
+  background-color: #444444;
+  color: #ffffff;
+  position: absolute;
+  bottom: 0px;
+}
+
+.chat-table-holder {
+  height: 80vh;
+}
+
+.chat-holder {
+  height: 100%;
+  position:relative;
+  height: 80vh;
+}
+
+.chat-holder-holder {
+  height: 100%;
+}
+
+.messageText {
+  padding-top: 5px;
+}
+
+.chat-table::-webkit-scrollbar {
+  width: 12px;               /* width of the entire scrollbar */
+}
+
+.chat-table::-webkit-scrollbar-track {
+  background: #444444;        /* color of the tracking area */
+}
+
+.chat-table::-webkit-scrollbar-thumb {
+  background-color: #666666;    /* color of the scroll thumb */
+  border-radius: 20px;       /* roundness of the scroll thumb */
+}
