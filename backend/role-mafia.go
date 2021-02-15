@@ -33,6 +33,8 @@ func (mafia MafiaRole) getVotingBarriers() []VotingBarrierInterface {
 	return barriers
 }
 
+func (mafia MafiaRole) initialize() {}
+
 type MafiaVotingBarrier struct {
 	Base VotingBarrierBase
 }

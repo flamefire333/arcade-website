@@ -10,13 +10,14 @@ type Role interface {
 	getTeam() int
 	getVotingBarriers() []VotingBarrierInterface
 	getNightChatGroup() int
+	initialize()
 }
 
 var allRoles []Role
 
 func initRoles() {
 	allRoles = nil
-	allRoles = append(allRoles, VillagerRole{Dummy: "Test"}, MafiaRole{})
+	allRoles = append(allRoles, VillagerRole{}, MafiaRole{}, DetectiveRole{}, BombRole{}, CultistRole{})
 }
 
 func getRole(id int) Role {
@@ -31,7 +32,10 @@ func getRole(id int) Role {
 
 const TEAM_VILLAGER = 1
 const TEAM_MAFIA = 2
+const TEAM_CULTIST = 3
 
 const ROLE_VILLAGER = 1
 const ROLE_MAFIA = 2
 const ROLE_DETECTIVE = 3
+const ROLE_BOMB = 4
+const ROLE_CULTIST = 5

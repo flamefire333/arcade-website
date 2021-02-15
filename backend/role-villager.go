@@ -1,7 +1,6 @@
 package main
 
 type VillagerRole struct {
-	Dummy string
 }
 
 func (villager VillagerRole) getRoleID() int {
@@ -31,3 +30,5 @@ func (villager VillagerRole) getVotingBarriers() []VotingBarrierInterface {
 func (villager VillagerRole) getNightChatGroup() int {
 	return CHAT_NOT_ALLOWED
 }
+
+func (villager VillagerRole) initialize() {}

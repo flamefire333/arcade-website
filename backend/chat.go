@@ -21,6 +21,7 @@ type Message struct {
 	Phase       int    `json:"phase"`
 	Type        int    `json:"messageType"`
 	ID          int    `json:"id"`
+	recipient   string
 }
 
 type PhaseMessageHolder struct {
@@ -32,13 +33,14 @@ type MessageHolder struct {
 }
 
 type ChatSendMessageRequest struct {
-	userID      string
-	displayName string
-	message     string
-	phase       int
-	startIndex  int
-	avatar      string
-	chatID      int
+	userID        string
+	displayName   string
+	message       string
+	phase         int
+	startIndex    int
+	avatar        string
+	chatID        int
+	toDisplayName string
 }
 
 type ChatReadMessageRequest struct {
@@ -46,6 +48,7 @@ type ChatReadMessageRequest struct {
 	phase      int
 	startIndex int
 	chatID     int
+	chatName   string
 }
 
 type ChatReadResponse struct {
@@ -62,12 +65,22 @@ func getChatID(name string) int {
 	return (<-mafiaOutgoingChannel).(int)
 }
 
+type GetChatNameRequest struct {
+	Name string
+}
+
+func getChatName(name string) string {
+	mafiaIngoingChannel <- GetChatNameRequest{Name: name}
+	return (<-mafiaOutgoingChannel).(string)
+}
+
 func sendMessage(request ChatSendMessageRequest) {
 	phaseHolder, ok := messageHolder.holders[request.phase]
 	if !ok {
 		phaseHolder = PhaseMessageHolder{messages: make([]Message, 0)}
 	}
-	message := Message{userID: request.userID, DisplayName: request.displayName, Message: request.message, Avatar: request.avatar, Phase: request.phase, Type: request.chatID, ID: len(phaseHolder.messages)}
+	message := Message{userID: request.userID, DisplayName: request.displayName, Message: request.message, Avatar: request.avatar,
+		Phase: request.phase, Type: request.chatID, ID: len(phaseHolder.messages), recipient: request.toDisplayName}
 	phaseHolder.messages = append(phaseHolder.messages, message)
 	messageHolder.holders[request.phase] = phaseHolder
 }
@@ -78,7 +91,7 @@ func readMessages(request ChatReadMessageRequest) []Message {
 		base := phaseHolder.messages[request.startIndex:]
 		ret := make([]Message, 0)
 		for _, message := range base {
-			if message.Type == request.chatID || request.chatID == CHAT_DEAD || message.Type == CHAT_ALL {
+			if (message.Type == request.chatID || request.chatID == CHAT_DEAD || message.Type == CHAT_ALL) && (message.recipient == "" || message.recipient == request.chatName) {
 				ret = append(ret, message)
 			}
 		}
@@ -94,7 +107,7 @@ func chatRequestHandler() {
 		switch r := request.(type) {
 		case ChatSendMessageRequest:
 			sendMessage(r)
-			readRequest := ChatReadMessageRequest{userID: r.userID, phase: r.phase, startIndex: r.startIndex, chatID: r.chatID}
+			readRequest := ChatReadMessageRequest{userID: r.userID, phase: r.phase, startIndex: r.startIndex, chatID: r.chatID, chatName: r.displayName}
 			chatOutgoingChannel <- readMessages(readRequest)
 		case ChatReadMessageRequest:
 			chatOutgoingChannel <- readMessages(r)
@@ -119,8 +132,9 @@ func addChatHandlers(router *mux.Router) {
 			log.Printf("Chat Read Failure 2: " + err.Error())
 			return
 		}
+		chatName := getChatName(username)
 		chatID := getChatID(username)
-		chatIngoingChannel <- ChatReadMessageRequest{username, phase, startID, chatID}
+		chatIngoingChannel <- ChatReadMessageRequest{username, phase, startID, chatID, chatName}
 		messages := (<-chatOutgoingChannel).([]Message)
 		json.NewEncoder(w).Encode(ChatReadResponse{Status: 0, Chat: messages})
 	})
@@ -142,7 +156,7 @@ func addChatHandlers(router *mux.Router) {
 			return
 		}
 		chatID := getChatID(data.UserName)
-		chatIngoingChannel <- ChatSendMessageRequest{data.UserName, data.CharacterName, data.Message, data.Phase, data.StartID, data.Avatar, chatID}
+		chatIngoingChannel <- ChatSendMessageRequest{data.UserName, data.CharacterName, data.Message, data.Phase, data.StartID, data.Avatar, chatID, ""}
 		messages := (<-chatOutgoingChannel).([]Message)
 		json.NewEncoder(w).Encode(ChatReadResponse{Status: 0, Chat: messages})
 	})
@@ -152,3 +166,4 @@ const CHAT_DEAD = 0
 const CHAT_ALL = 1
 const CHAT_MAFIA = 2
 const CHAT_NOT_ALLOWED = 3
+const CHAT_CULTIST = 4

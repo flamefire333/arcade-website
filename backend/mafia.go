@@ -20,14 +20,6 @@ type User struct {
 	Name string `json:"name"`
 }
 
-type MafiaUser struct {
-	Name      string
-	Alive     bool
-	Role      Role
-	Character Character
-	Will      string
-}
-
 type MafiaStatusRequest struct {
 	Name string `json:"name"`
 }
@@ -201,6 +193,11 @@ type WillRequest struct {
 	Will string `json:"will"`
 }
 
+type ForceQuitRequest struct {
+	Name string `json:"name"`
+	Will string `json:"will"`
+}
+
 type FrontEndRoleData struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
@@ -316,7 +313,16 @@ func setupGame(r SetupRequest) {
 	mafiaUsers = make([]MafiaUser, 0, len(rolesToUse))
 	for i := 0; i < len(rolesToUse); i = i + 1 {
 		roleToUse := getRole(rolesToUse[i])
-		mafiaUsers = append(mafiaUsers, MafiaUser{Name: users[i].Name, Role: roleToUse, Character: groupCharacters[i], Alive: true, Will: ""})
+		mafiaUsers = append(mafiaUsers, generateMafiaUser(users[i].Name, roleToUse, groupCharacters[i]))
+	}
+	//TODO this could be more efficient, but its a one time setup thing so :shrug:
+	for i := range allRoles {
+		for j := range rolesToUse {
+			if allRoles[i].getRoleID() == rolesToUse[j] {
+				allRoles[i].initialize()
+				break
+			}
+		}
 	}
 	rand.Shuffle(len(mafiaUsers), func(i, j int) { mafiaUsers[i], mafiaUsers[j] = mafiaUsers[j], mafiaUsers[i] })
 	setGameToDay()
@@ -346,24 +352,31 @@ func mainMafiaLogic() {
 		teamCounts := make(map[int]int, 0)
 		teamCounts[TEAM_VILLAGER] = 0
 		teamCounts[TEAM_MAFIA] = 0
+		teamCounts[TEAM_CULTIST] = 0
+		totalAlive := 0
 		for i := range mafiaUsers {
 			if mafiaUsers[i].Alive {
 				teamCounts[mafiaUsers[i].Role.getTeam()]++
+				totalAlive++
 			}
 		}
-		if teamCounts[TEAM_MAFIA] == 0 {
-			endGame("Villagers Win: Mafia is all dead")
+		if teamCounts[TEAM_MAFIA] == 0 && teamCounts[TEAM_CULTIST] == 0 {
+			endGame("Villagers Win: The evildoers are all dead")
 			return
 		}
-		if teamCounts[TEAM_MAFIA] >= teamCounts[TEAM_VILLAGER] {
-			endGame("Mafia Wins: Mafia outnumbers Villagers")
+		if 2*teamCounts[TEAM_MAFIA] >= totalAlive {
+			endGame("Mafia Wins: Mafia outnumber everyone else")
 			return
+		}
+		if 2*teamCounts[TEAM_CULTIST] >= totalAlive {
+			endGame("Cultists Win: Cultists outnumber everyone else")
 		}
 		allBarriesDone := true
 		for _, barrier := range activeVotingBarriers {
 			votingList := barrier.getVoters()
 			votes := barrier.getBase().Votes
 			if len(votingList) != len(votes) {
+				//log.Printf("Not done %+v %+v %+v", votingList, votes, barrier)
 				allBarriesDone = false
 			}
 		}
@@ -388,9 +401,33 @@ func mainMafiaLogic() {
 
 func sendInfoMessage(message string, chatID int, phaseMod int) {
 	log.Printf("INFO MESSAGE: " + message)
-	chatIngoingChannel <- ChatSendMessageRequest{userID: "", displayName: "Info", message: message, phase: CurrentGameInfo.Phase + phaseMod, startIndex: 0, avatar: "https://cdn.discordapp.com/emojis/759196861927260171.png?v=1", chatID: chatID}
+	chatIngoingChannel <- ChatSendMessageRequest{userID: "", displayName: "Info", message: message, phase: CurrentGameInfo.Phase + phaseMod, startIndex: 0, avatar: "https://cdn.discordapp.com/emojis/759196861927260171.png?v=1", chatID: chatID, toDisplayName: ""}
 	//Clear up the response so chat continues to work
 	<-chatOutgoingChannel
+}
+
+func sendPrivateInfoMessage(message string, chatID int, phaseMod int, recipient string) {
+	log.Printf("PRIVATE INFO MESSAGE: " + message)
+	chatIngoingChannel <- ChatSendMessageRequest{userID: "", displayName: "Info", message: message, phase: CurrentGameInfo.Phase + phaseMod, startIndex: 0, avatar: "https://cdn.discordapp.com/emojis/759196861927260171.png?v=1", chatID: chatID, toDisplayName: recipient}
+	//Clear up the response so chat continues to work
+	<-chatOutgoingChannel
+}
+
+func setPlayerRoleByNameFromVote(name string, roleID int, vote VotingBarrierInterface) {
+	user := getMafiaUserByCharacterName(name)
+	if user == nil {
+		log.Printf("Could Not Find %s to Kill", name)
+		return
+	}
+	if user.Alive {
+		for i := range allRoles {
+			if allRoles[i].getRoleID() == roleID {
+				user.Role = allRoles[i]
+				sendPrivateInfoMessage("You have been converted into a "+user.Role.getName(), CHAT_ALL, 1, name)
+				break
+			}
+		}
+	}
 }
 
 func killPlayerByNameFromVote(name string, vote VotingBarrierInterface) {
@@ -403,6 +440,25 @@ func killPlayerByNameFromVote(name string, vote VotingBarrierInterface) {
 		user.Alive = false
 		will := user.Will
 		sendInfoMessage(user.Character.Name+" has been killed, they left the following will \""+will+"\"", CHAT_ALL, 1)
+		for i := range user.Traits {
+			user.Traits[i].onDeathByVote(vote, user)
+		}
+	}
+}
+
+func killPlayerByNameFromPlayerAction(name string, killer *MafiaUser) {
+	user := getMafiaUserByCharacterName(name)
+	if user == nil {
+		log.Printf("Could Not Find %s to Kill", name)
+		return
+	}
+	if user.Alive {
+		user.Alive = false
+		will := user.Will
+		sendInfoMessage(user.Character.Name+" has been killed, they left the following will \""+will+"\"", CHAT_ALL, 1)
+		for i := range user.Traits {
+			user.Traits[i].onDeathByPlayerAction(killer, user)
+		}
 	}
 }
 
@@ -441,26 +497,45 @@ func mafiaRequestHandler() {
 			if user != nil {
 				user.Will = r.Will
 			}
+		case ForceQuitRequest:
+			if CurrentGameInfo.Started {
+				endGame("Ended by Admin")
+			}
+			clearMafiaStatusCache()
 		case GetUsersRequest:
 			mafiaOutgoingChannel <- users
-		case GetChatIDRequest:
-			found := false
-			for _, user := range mafiaUsers {
-				if user.Name == r.Name && !found {
-					found = true
-					if user.Alive {
-						if CurrentGameInfo.Day {
-							mafiaOutgoingChannel <- CHAT_ALL
-						} else {
-							mafiaOutgoingChannel <- user.Role.getNightChatGroup()
-						}
-					} else {
-						mafiaOutgoingChannel <- CHAT_DEAD
+		case GetChatNameRequest:
+			ret := r.Name
+			if CurrentGameInfo.Started {
+				for i := range mafiaUsers {
+					if mafiaUsers[i].Name == r.Name {
+						ret = mafiaUsers[i].Character.Name
 					}
 				}
 			}
-			if !found {
-				mafiaOutgoingChannel <- CHAT_DEAD
+			mafiaOutgoingChannel <- ret
+		case GetChatIDRequest:
+			found := false
+			if CurrentGameInfo.Started {
+				for _, user := range mafiaUsers {
+					if user.Name == r.Name && !found {
+						found = true
+						if user.Alive {
+							if CurrentGameInfo.Day {
+								mafiaOutgoingChannel <- CHAT_ALL
+							} else {
+								mafiaOutgoingChannel <- user.Role.getNightChatGroup()
+							}
+						} else {
+							mafiaOutgoingChannel <- CHAT_DEAD
+						}
+					}
+				}
+				if !found {
+					mafiaOutgoingChannel <- CHAT_DEAD
+				}
+			} else {
+				mafiaOutgoingChannel <- CHAT_ALL
 			}
 		default:
 			log.Printf("Unexpected mafia request %+v", request)
@@ -520,6 +595,9 @@ func addMafiaHandlers(router *mux.Router) {
 		}
 		mafiaIngoingChannel <- data
 		json.NewEncoder(w).Encode(RequestResponse{Status: 0, Info: nil})
+	})
+	router.HandleFunc("/api/mafia/forcequit", func(w http.ResponseWriter, r *http.Request) {
+		mafiaIngoingChannel <- ForceQuitRequest{}
 	})
 	router.HandleFunc("/api/mafia/vote/{user}/{containerID:[0-9]+}/{vote}", func(w http.ResponseWriter, r *http.Request) {
 		username := mux.Vars(r)["user"]
