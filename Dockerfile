@@ -1,3 +1,9 @@
+FROM node:12.7-alpine AS build
+WORKDIR /usr/src/app
+COPY frontend-source/ .
+RUN npm install
+RUN npm run build
+
 FROM golang:alpine AS build
 RUN apk --no-cache add gcc g++ make git
 WORKDIR /go/src/app
