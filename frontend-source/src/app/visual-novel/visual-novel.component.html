@@ -1,0 +1,8 @@
+<div class="dialogue" *ngFor="let i of [0, 1, 2, 3]">
+  {{this.targetText.slice(this.breaks[i], this.breaks[i + 1])}}
+</div>
+<div class="tinyHideBox">
+  <div #widthChecker class="widthChecker">
+    {{this.targetText.slice(this.breaks[this.currLineIndex], this.breaks[this.currLineIndex + 1])}}
+  </div>
+</div>

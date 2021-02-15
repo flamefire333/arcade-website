@@ -1,0 +1,25 @@
+<div class="view">
+  <div id="lobby">
+    <div class="lobby-table">
+      <div *ngFor="let section of this.sections">
+        <div><h2>{{section.title}}</h2></div>
+        <div *ngFor='let player of section.items; let index = index' class="lobby-table-div"
+             [class.lobby-table-even]="0 === index % 2 && player.name !== this.active"
+             [class.lobby-table-active]="player.name === this.active">
+          <div class="status-icon">
+            <app-icon-with-tooltip
+              [name]="player.roleName" [icon]="player.roleIcon" [description]="player.roleDescription"
+              *ngIf="!!player.roleName">
+            </app-icon-with-tooltip>
+            <mat-icon *ngIf="player.time < 20 && !player.icon" class="lefticon">face</mat-icon>
+            <mat-icon *ngIf="player.time >= 20 && player.time < 40 && !player.icon" class="lefticon">access_alarm
+            </mat-icon>
+            <mat-icon *ngIf="player.time >= 40 && !player.icon" class="lefticon">warning</mat-icon>
+          </div>
+          <img class="avatar" [src]="player.icon" *ngIf="!!player.icon" [ngClass]="{'gray':player.isGrayed}">
+          {{player.name}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

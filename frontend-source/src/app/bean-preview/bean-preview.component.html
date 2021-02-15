@@ -1,0 +1,8 @@
+<div class="container" [style.width.px]="200 * this.scale" [style.height.px]="350 * this.scale">
+  <div class="hat">
+    <img class="hat" src="{{this.hatSrc}}"  [style.width.px]="this.scale * this.width" [style.top.px]="this.scale * this.hatdy" [style.left.px]="this.scale * this.hatdx"/>
+  </div>
+  <div class="bean">
+    <img class="bean" [style.width.px]="200 * this.scale" [style.top.px]="65 * this.scale" src="{{this.colorSrc}}"/>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+.beanPreview {
+  display: flex;
+  width: 75vw;
+  flex-wrap: wrap;
+}
+.beanPreviewElement {
+  border-style: solid;
+  border-color: #dddddd;
+  padding: 30px;
+}

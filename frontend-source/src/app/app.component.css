@@ -1,0 +1,16 @@
+.vcenter {
+  vertical-align: center;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  background-color: #000000;
+  color: #ffffff;
+  height: 100%;
+}
+
+.vholder {
+  margin-top: auto;
+  margin-bottom: auto;
+  background-color:#222222;
+}

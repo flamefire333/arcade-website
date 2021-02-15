@@ -1,0 +1,28 @@
+<form [formGroup]="loginForm" id="login-form">
+  <h2>Join Game Menu</h2>
+  <mat-icon class="lefticon">face</mat-icon>
+  <mat-form-field appearance="fill">
+    <input required matInput id="user" formControlName="name" type="text" placeholder="username" class="input" #user>
+    <mat-error>
+      <div *ngIf="loginForm?.controls.name?.errors?.required">Required Field</div>
+      <div *ngIf="loginForm?.controls.name?.errors?.minlength">Minimum Length is 3</div>
+      <div *ngIf="loginForm?.controls.name?.errors?.maxlength">Maximum Length is 20</div>
+      <div *ngIf="loginForm?.controls.name?.errors?.pattern">Only alphanumeric and space is allowed in names</div>
+    </mat-error>
+  </mat-form-field><br/>
+  <div class="spacer"></div><br/>
+  <mat-icon class="lefticon">videogame_asset</mat-icon>
+  <mat-form-field appearance="fill">
+    <mat-label>Select an option</mat-label>
+    <mat-select [(value)]="selected" required formControlName="game">
+      <mat-option value="fe3hau">FE3H Among Us</mat-option>
+      <mat-option value="mafia">Mafia</mat-option>
+    </mat-select>
+    <mat-error>
+      <span *ngIf="loginForm?.controls.name?.errors?.required">Required Field</span>
+    </mat-error>
+  </mat-form-field>
+    <br/>
+  <div class="spacer"></div><br/>
+  <button mat-raised-button color="primary" (click)="join(user.value, selected)">Join</button>
+</form>

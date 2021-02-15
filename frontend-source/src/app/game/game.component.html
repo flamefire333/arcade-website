@@ -1,0 +1,6 @@
+<div id="game">
+  <app-fe3hau *ngIf="this.game === 'fe3hau'">
+  </app-fe3hau>
+  <app-mafia [username]="this.username" *ngIf="this.game === 'mafia'">
+  </app-mafia>
+</div>

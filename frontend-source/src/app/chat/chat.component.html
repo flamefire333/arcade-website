@@ -1,0 +1,25 @@
+<div class="chat-holder-holder">
+  <div class="chat-holder">
+    <div class="chat-table-holder" #chatTableHolder>
+      <table class="chat-table" #chatTable>
+        <tr *ngFor="let message of this.messages">
+          <td class="sender-avatar-holder"><img [src]="message.avatar" class="sender-avatar"></td>
+          <td>
+            <div [class.dead]="message.type === 0" class="messageContent">
+              <div class="sender">{{message.sender}}</div>
+              <div class="messageText">
+                <span *ngFor="let messageData of message.data">
+                  <span *ngIf="messageData.isEmote">
+                    <img class="emote" [src]="messageData.image">
+                  </span>
+                  <span *ngIf="!messageData.isEmote">{{messageData.code}}</span>
+                </span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <input matInput id="chatEntry" class="chat-input" type="text" (keyup)="ChatOnKey($event)" #chatEntry>
+  </div>
+</div>
