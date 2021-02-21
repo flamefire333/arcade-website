@@ -288,7 +288,7 @@ export class ChatComponent implements OnInit {
       [['jake'], 'https://cdn.discordapp.com/avatars/314239819767218177/5dc1fc943dcd98aa4473f705fef490c8.png?size=256'],
       [['j.*lian'], 'https://cdn.discordapp.com/avatars/244248142944534528/bd1dd8f71b74dcf00ec5e76a8b03471c.png?size=256'],
       [['zy.*'], 'https://cdn.discordapp.com/avatars/262390464202801152/7bc4bb160466cd1846319bcab066fb85.png?size=256'],
-      [['sh.*ve.*', 'soup.*', 'wooloo.*'], 'https://cdn.discordapp.com/avatars/262390464202801152/7bc4bb160466cd1846319bcab066fb85.png?size=256'],
+      [['sh.*ve.*', 'soup.*', 'wooloo.*'], 'https://cdn.discordapp.com/avatars/384881337590480907/b6fd4578174312f74c5d17593513da3c.png?size=256'],
       [['dino.*', 'cow.*'], 'https://cdn.discordapp.com/avatars/168166430473191424/a_4840637c930c4edbfa5fa87b79d572d3.gif?size=256'],
       [['may.*', '.*union.*'], 'https://cdn.discordapp.com/avatars/314240091591540749/429e43eceb35ccd104a6bfac9c25c27d.png?size=256'],
       [['beep.*'], 'https://cdn.discordapp.com/avatars/330387628203442186/2735a3b1b08de9bc82601c782e02816c.png?size=256'],
