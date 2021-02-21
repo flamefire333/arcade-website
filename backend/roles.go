@@ -17,7 +17,7 @@ var allRoles []Role
 
 func initRoles() {
 	allRoles = nil
-	allRoles = append(allRoles, VillagerRole{}, MafiaRole{}, DetectiveRole{}, BombRole{}, CultistRole{})
+	allRoles = append(allRoles, VillagerRole{}, MafiaRole{}, DetectiveRole{}, BombRole{}, CultistRole{}, VoodooRole{})
 }
 
 func getRole(id int) Role {
@@ -39,3 +39,4 @@ const ROLE_MAFIA = 2
 const ROLE_DETECTIVE = 3
 const ROLE_BOMB = 4
 const ROLE_CULTIST = 5
+const ROLE_VOODOO = 6

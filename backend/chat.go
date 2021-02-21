@@ -118,6 +118,15 @@ func chatRequestHandler() {
 	}
 }
 
+type sendMessageRequestData struct {
+	StartID       int    `json:"startID"`
+	Phase         int    `json:"phase"`
+	Avatar        string `json:"avatar"`
+	UserName      string `json:"user_name"`
+	CharacterName string `json:"character_name"`
+	Message       string `json:"message"`
+}
+
 func addChatHandlers(router *mux.Router) {
 
 	router.HandleFunc("/api/mafia/chat/read/{user}/{phase:[0-9]+}/{startID:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
@@ -141,14 +150,6 @@ func addChatHandlers(router *mux.Router) {
 
 	router.HandleFunc("/api/mafia/chat/send", func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
-		type sendMessageRequestData struct {
-			StartID       int    `json:"startID"`
-			Phase         int    `json:"phase"`
-			Avatar        string `json:"avatar"`
-			UserName      string `json:"user_name"`
-			CharacterName string `json:"character_name"`
-			Message       string `json:"message"`
-		}
 		var data sendMessageRequestData
 		err := decoder.Decode(&data)
 		if err != nil {
@@ -156,6 +157,8 @@ func addChatHandlers(router *mux.Router) {
 			return
 		}
 		chatID := getChatID(data.UserName)
+		mafiaIngoingChannel <- data
+		data = (<-mafiaOutgoingChannel).(sendMessageRequestData)
 		chatIngoingChannel <- ChatSendMessageRequest{data.UserName, data.CharacterName, data.Message, data.Phase, data.StartID, data.Avatar, chatID, ""}
 		messages := (<-chatOutgoingChannel).([]Message)
 		json.NewEncoder(w).Encode(ChatReadResponse{Status: 0, Chat: messages})

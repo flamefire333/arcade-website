@@ -65,37 +65,42 @@
           <textarea (keyup)="this.willSubject.next(will.value)" matInput placeholder="I cry for I die" #will></textarea>
         </mat-form-field>
       </div>
-      <div class="panel-item mat-elevation-z8" *ngIf="this.started && this.isAlive && this.votes.length > 0">
-        <h2>{{this.votingTitle}}</h2>
-        <h3>Current Choices</h3>
-        <div>
-          <table>
-            <tr *ngFor="let dayVote of this.votes">
-              <td>
-                {{dayVote.name}}:
-              </td>
-              <td>
-                {{dayVote.vote}}
-              </td>
-            </tr>
-          </table>
+      <div *ngIf="this.started && this.isAlive" [formGroup]="this.votingFormGroup">
+        <div class="panel-item mat-elevation-z8"
+             *ngFor="let container of this.voteContainers; trackBy: voteContainerTrackBy">
+          <h2>{{container.title}}</h2>
+          <div>
+            <table>
+              <tr *ngFor="let vote of container.list">
+                <td>
+                  {{vote.name}}:
+                </td>
+                <td>
+                  {{vote.vote}}
+                </td>
+              </tr>
+            </table>
+          </div>
+          <mat-form-field appearance="fill" class="selection"
+                          *ngFor="let field of container.fields; trackBy: voteFieldTrackBy">
+              <mat-label *ngIf="field.type === 'option'">Choose who to vote for</mat-label>
+              <mat-select [formControlName]="this.getFormControlName(field)" *ngIf="field.type === 'option'">
+                <mat-option
+                  [value]="'No One'"
+                  (click)="this.sendDayVote('No One', field.barrierID)">
+                  No One
+                </mat-option>
+                <mat-option
+                  *ngFor="let char of this.aliveCharacterNames"
+                  [value]="char"
+                  (click)="this.sendDayVote(char, field.barrierID)">
+                  {{char}}
+                </mat-option>
+              </mat-select>
+            <mat-label *ngIf="field.type === 'text'">Type a 4+ letter word to curse</mat-label>
+              <input matInput type="text" (keyup)="this.sendVoteTextEvent(field)" [formControlName]="this.getFormControlName(field)" *ngIf="field.type === 'text'">
+          </mat-form-field>
         </div>
-        <mat-form-field appearance="fill" class="selection">
-          <mat-label>Choose who to vote for</mat-label>
-          <mat-select [(value)]="this.voteChoice">
-            <mat-option
-              [value]="'No One'"
-              (click)="this.sendDayVote('No One', this.voteBarrierID)">
-              No One
-            </mat-option>
-            <mat-option
-              *ngFor="let char of this.aliveCharacterNames"
-              [value]="char"
-              (click)="this.sendDayVote(char, this.voteBarrierID)">
-              {{char}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
       </div>
     </div>
   </div>

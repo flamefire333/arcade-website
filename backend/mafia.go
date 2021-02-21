@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -56,20 +57,40 @@ type ActiveCharacter struct {
 type VotingBarrierInterface interface {
 	getVoters() []string
 	getOptions() []string
-	executeOption(option string)
+	executeOption(option []string)
 	getBase() *VotingBarrierBase
+	getTitle() string
 }
 
-func (voteBarrierBase VotingBarrierBase) getVoteList(barrier VotingBarrierInterface) []Vote {
+func (voteBarrierBase VotingBarrierBase) getVoteList(barrier VotingBarrierInterface, barrierID int) []Vote {
 	votes := make([]Vote, 0, len(voteBarrierBase.Votes))
 	voters := barrier.getVoters()
 	for _, voter := range voters {
-		v, exists := voteBarrierBase.Votes[voter]
+		v, exists := voteBarrierBase.Votes[barrierID][voter]
 		if exists {
 			votes = append(votes, Vote{Voter: voter, Voted: v})
 		} else {
 			votes = append(votes, Vote{Voter: voter, Voted: "Has Not Voted"})
 		}
+	}
+	return votes
+}
+
+func (voteBarrierBase VotingBarrierBase) getTotalVoteList(barrier VotingBarrierInterface) []Vote {
+	votes := make([]Vote, 0, len(voteBarrierBase.Votes))
+	voters := barrier.getVoters()
+	for _, voter := range voters {
+		items := make([]string, 0)
+		for i := range barrier.getBase().Fields {
+			barrierID := barrier.getBase().Fields[i].BarrierID
+			v, exists := voteBarrierBase.Votes[barrierID][voter]
+			if exists {
+				items = append(items, v)
+			} else {
+				items = append(items, "Has Not Voted")
+			}
+		}
+		votes = append(votes, Vote{Voter: voter, Voted: strings.Join(items, ", ")})
 	}
 	return votes
 }
@@ -96,6 +117,10 @@ func (dvb DayVotingBarrier) getVoters() []string {
 	return voters
 }
 
+func (dvb DayVotingBarrier) getTitle() string {
+	return "Day Vote"
+}
+
 func (dvb DayVotingBarrier) getOptions() []string {
 	options := make([]string, 0)
 	options = append(options, "No One")
@@ -107,8 +132,8 @@ func (dvb DayVotingBarrier) getOptions() []string {
 	return options
 }
 
-func (dvb DayVotingBarrier) executeOption(option string) {
-	killPlayerByNameFromVote(option, dvb)
+func (dvb DayVotingBarrier) executeOption(option []string) {
+	killPlayerByNameFromVote(option[0], dvb, 1)
 }
 
 func (dvb DayVotingBarrier) getBase() *VotingBarrierBase {
@@ -116,46 +141,61 @@ func (dvb DayVotingBarrier) getBase() *VotingBarrierBase {
 }
 
 type VotingBarrierBase struct {
-	Votes map[string]string
-	ID    int
+	Votes  map[int]map[string]string
+	Fields []VoteField
 }
 
-func (base VotingBarrierBase) getWinningOption(barrier VotingBarrierInterface) (string, int) {
-	tallies := make(map[string]int, 0)
-	voteList := base.getVoteList(barrier)
-	maxTally := 0
-	for _, vote := range voteList {
-		tally, exists := tallies[vote.Voted]
-		if !exists {
-			tally = 0
+func (base VotingBarrierBase) getWinningOption(barrier VotingBarrierInterface) []string {
+	options := make([]string, 0)
+	for i := range base.Fields {
+		tallies := make(map[string]int, 0)
+		voteList := base.getVoteList(barrier, base.Fields[i].BarrierID)
+		maxTally := 0
+		for _, vote := range voteList {
+			tally, exists := tallies[vote.Voted]
+			if !exists {
+				tally = 0
 
-		}
-		tally = tally + 1
-		tallies[vote.Voted] = tally
-		if tally > maxTally {
-			maxTally = tally
-		}
-	}
-	if maxTally == 0 {
-		return "", 0
-	}
-	choices := make([]string, 0)
-	for k, v := range tallies {
-		if v == maxTally {
-			if k == "No One" {
-				return k, maxTally
 			}
-			choices = append(choices, k)
+			tally = tally + 1
+			tallies[vote.Voted] = tally
+			if tally > maxTally {
+				maxTally = tally
+			}
+		}
+		if maxTally == 0 {
+			return make([]string, 0)
+		}
+		choices := make([]string, 0)
+		hasNoOne := false
+		for k, v := range tallies {
+			if v == maxTally {
+				if k == "No One" {
+					hasNoOne = true
+				}
+				choices = append(choices, k)
+			}
+		}
+		if hasNoOne {
+			options = append(options, "No One")
+		} else {
+			rand.Shuffle(len(choices), func(i, j int) { choices[i], choices[j] = choices[j], choices[i] })
+			options = append(options, choices[0])
 		}
 	}
-	rand.Shuffle(len(choices), func(i, j int) { choices[i], choices[j] = choices[j], choices[i] })
-	return choices[0], maxTally
+	return options
+}
+
+type VoteField struct {
+	Type      string   `json:"type"`
+	Options   []string `json:"options"`
+	BarrierID int      `json:"barrierID"`
 }
 
 type VotingData struct {
-	Title string `json:"title"`
-	ID    int    `json:"id"`
-	List  []Vote `json:"list"`
+	Title  string      `json:"title"`
+	Fields []VoteField `json:"fields"`
+	List   []Vote      `json:"list"`
 }
 
 type Vote struct {
@@ -233,6 +273,17 @@ func clearMafiaStatusCache() {
 	mafiaStatusCache = make(map[string]MafiaStatus, 0)
 }
 
+func getStandardVotingOptions() []string {
+	options := make([]string, 0)
+	options = append(options, "No One")
+	for i := range mafiaUsers {
+		if mafiaUsers[i].Alive {
+			options = append(options, mafiaUsers[i].Character.Name)
+		}
+	}
+	return options
+}
+
 func getMafiaStatus(name string) MafiaStatus {
 	currentMafiaUser := getMafiaUserByName(name)
 	myCharacterName := ""
@@ -254,12 +305,19 @@ func getMafiaStatus(name string) MafiaStatus {
 		voters := barrier.getVoters()
 		for _, voter := range voters {
 			if voter == myCharacterName {
-				votingData = append(votingData, VotingData{Title: "Vote", ID: barrier.getBase().ID, List: barrier.getBase().getVoteList(barrier)})
+				fields := barrier.getBase().Fields
+				votingData = append(votingData, VotingData{Title: barrier.getTitle(), Fields: fields, List: barrier.getBase().getTotalVoteList(barrier)})
 				break
 			}
 		}
 	}
-	status := MafiaStatus{LobbyData: users, GameInfo: gameInfo, ActiveRoles: activeRoles, Characters: characters, MyCharacter: myCharacterName, VotingData: votingData}
+	nonzeroActiveRoles := make([]ActiveRole, 0)
+	for i := range activeRoles {
+		if activeRoles[i].Amount > 0 {
+			nonzeroActiveRoles = append(nonzeroActiveRoles, activeRoles[i])
+		}
+	}
+	status := MafiaStatus{LobbyData: users, GameInfo: gameInfo, ActiveRoles: nonzeroActiveRoles, Characters: characters, MyCharacter: myCharacterName, VotingData: votingData}
 	mafiaStatusCache[name] = status
 	return status
 }
@@ -271,11 +329,25 @@ var activeVotingBarriers = make([]VotingBarrierInterface, 0)
 
 var lastDayChange = time.Now()
 
+func getStandardBaseVotes(barrierIDs []int) map[int]map[string]string {
+	outerMap := make(map[int]map[string]string, 0)
+	for _, barrierID := range barrierIDs {
+		innerMap := make(map[string]string, 0)
+		outerMap[barrierID] = innerMap
+	}
+	return outerMap
+}
+
 func setGameToDay() {
 	CurrentGameInfo.Phase = CurrentGameInfo.Phase + 1
 	CurrentGameInfo.Day = true
 	CurrentGameInfo.DayCount = CurrentGameInfo.DayCount + 1
-	dayVotingBarrier := DayVotingBarrier{Base: VotingBarrierBase{Votes: make(map[string]string, 0), ID: GetNextVotingBarrierID()}}
+	barrierIDs := make([]int, 0)
+	barrierID := GetNextVotingBarrierID()
+	barrierIDs = append(barrierIDs, barrierID)
+	fields := make([]VoteField, 0)
+	fields = append(fields, VoteField{Type: "option", Options: getStandardVotingOptions(), BarrierID: barrierID})
+	dayVotingBarrier := DayVotingBarrier{Base: VotingBarrierBase{Votes: getStandardBaseVotes(barrierIDs), Fields: fields}}
 	activeVotingBarriers = []VotingBarrierInterface{dayVotingBarrier}
 	lastDayChange = time.Now()
 }
@@ -289,6 +361,15 @@ func setGameToNight() {
 		for i := range barriers {
 			activeVotingBarriers = append(activeVotingBarriers, barriers[i])
 		}
+	}
+	for i := range mafiaUsers {
+		keptTraits := make([]Trait, 0)
+		for j := range mafiaUsers[i].Traits {
+			if mafiaUsers[i].Traits[j].shouldKeepOnNightChange() {
+				keptTraits = append(keptTraits, mafiaUsers[i].Traits[j])
+			}
+		}
+		mafiaUsers[i].Traits = keptTraits
 	}
 	lastDayChange = time.Now()
 }
@@ -333,8 +414,10 @@ func handleVote(request VoteRequest) {
 	mafiaUser := getMafiaUserByName(request.Name)
 	if mafiaUser != nil {
 		for _, barrier := range activeVotingBarriers {
-			if barrier.getBase().ID == request.ContainerID {
-				barrier.getBase().Votes[mafiaUser.Character.Name] = request.Vote
+			for _, field := range barrier.getBase().Fields {
+				if field.BarrierID == request.ContainerID {
+					barrier.getBase().Votes[request.ContainerID][mafiaUser.Character.Name] = request.Vote
+				}
 			}
 		}
 	}
@@ -374,18 +457,20 @@ func mainMafiaLogic() {
 		allBarriesDone := true
 		for _, barrier := range activeVotingBarriers {
 			votingList := barrier.getVoters()
-			votes := barrier.getBase().Votes
-			if len(votingList) != len(votes) {
-				//log.Printf("Not done %+v %+v %+v", votingList, votes, barrier)
-				allBarriesDone = false
+			for _, field := range barrier.getBase().Fields {
+				votes := barrier.getBase().Votes[field.BarrierID]
+				if len(votingList) != len(votes) {
+					//log.Printf("Not done %+v %+v %+v", votingList, votes, barrier)
+					allBarriesDone = false
+				}
 			}
 		}
 		if allBarriesDone && time.Now().Sub(lastDayChange) > 30*time.Second {
 			//TODO do barrier actions
 			for _, barrier := range activeVotingBarriers {
 				base := barrier.getBase()
-				option, count := base.getWinningOption(barrier)
-				if count > 0 {
+				option := base.getWinningOption(barrier)
+				if len(option) > 0 {
 					barrier.executeOption(option)
 				}
 			}
@@ -430,23 +515,15 @@ func setPlayerRoleByNameFromVote(name string, roleID int, vote VotingBarrierInte
 	}
 }
 
-func killPlayerByNameFromVote(name string, vote VotingBarrierInterface) {
-	user := getMafiaUserByCharacterName(name)
-	if user == nil {
-		log.Printf("Could Not Find %s to Kill", name)
-		return
-	}
-	if user.Alive {
-		user.Alive = false
-		will := user.Will
-		sendInfoMessage(user.Character.Name+" has been killed, they left the following will \""+will+"\"", CHAT_ALL, 1)
-		for i := range user.Traits {
-			user.Traits[i].onDeathByVote(vote, user)
+func addTraitToPlayerByName(name string, trait Trait) {
+	for i := range mafiaUsers {
+		if mafiaUsers[i].Alive && mafiaUsers[i].Character.Name == name {
+			mafiaUsers[i].Traits = append(mafiaUsers[i].Traits, trait)
 		}
 	}
 }
 
-func killPlayerByNameFromPlayerAction(name string, killer *MafiaUser) {
+func killPlayerByNameFromVote(name string, vote VotingBarrierInterface, phaseMod int) {
 	user := getMafiaUserByCharacterName(name)
 	if user == nil {
 		log.Printf("Could Not Find %s to Kill", name)
@@ -455,9 +532,25 @@ func killPlayerByNameFromPlayerAction(name string, killer *MafiaUser) {
 	if user.Alive {
 		user.Alive = false
 		will := user.Will
-		sendInfoMessage(user.Character.Name+" has been killed, they left the following will \""+will+"\"", CHAT_ALL, 1)
+		sendInfoMessage(user.Character.Name+" has been killed, they left the following will \""+will+"\"", CHAT_ALL, phaseMod)
 		for i := range user.Traits {
-			user.Traits[i].onDeathByPlayerAction(killer, user)
+			user.Traits[i].onDeathByVote(vote, user, phaseMod)
+		}
+	}
+}
+
+func killPlayerByNameFromPlayerAction(name string, killer *MafiaUser, phaseMod int) {
+	user := getMafiaUserByCharacterName(name)
+	if user == nil {
+		log.Printf("Could Not Find %s to Kill", name)
+		return
+	}
+	if user.Alive {
+		user.Alive = false
+		will := user.Will
+		sendInfoMessage(user.Character.Name+" has been killed, they left the following will \""+will+"\"", CHAT_ALL, phaseMod)
+		for i := range user.Traits {
+			user.Traits[i].onDeathByPlayerAction(killer, user, phaseMod)
 		}
 	}
 }
@@ -475,6 +568,18 @@ func mafiaRequestHandler() {
 			}
 		case User:
 			users = append(users, r)
+			clearMafiaStatusCache()
+		case sendMessageRequestData:
+			message := r.Message
+			for i := range mafiaUsers {
+				if mafiaUsers[i].Alive && mafiaUsers[i].Character.Name == r.CharacterName {
+					for j := range mafiaUsers[i].Traits {
+						message = mafiaUsers[i].Traits[j].messageConvert(message, &mafiaUsers[i])
+					}
+				}
+			}
+			r.Message = message
+			mafiaOutgoingChannel <- r
 			clearMafiaStatusCache()
 		case KickUserRequest:
 			for i := range users {

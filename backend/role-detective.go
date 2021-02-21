@@ -30,8 +30,12 @@ func (detective DetectiveRole) getVotingBarriers() []VotingBarrierInterface {
 	barriers := make([]VotingBarrierInterface, 0, 1)
 	for i := range mafiaUsers {
 		if mafiaUsers[i].Role.getRoleID() == ROLE_DETECTIVE {
-			emptyMap := make(map[string]string, 0)
-			barriers = append(barriers, DetectiveVotingBarrier{Base: VotingBarrierBase{Votes: emptyMap, ID: GetNextVotingBarrierID()}, Name: mafiaUsers[i].Character.Name})
+			barrierIDs := make([]int, 0)
+			barrierID := GetNextVotingBarrierID()
+			barrierIDs = append(barrierIDs, barrierID)
+			fields := make([]VoteField, 0)
+			fields = append(fields, VoteField{Type: "option", Options: getStandardVotingOptions(), BarrierID: barrierID})
+			barriers = append(barriers, DetectiveVotingBarrier{Base: VotingBarrierBase{Votes: getStandardBaseVotes(barrierIDs), Fields: fields}, Name: mafiaUsers[i].Character.Name})
 		}
 	}
 	return barriers
@@ -54,6 +58,10 @@ func (dvb DetectiveVotingBarrier) getVoters() []string {
 	return voters
 }
 
+func (mvb DetectiveVotingBarrier) getTitle() string {
+	return "Detective Investigation"
+}
+
 func (dvb DetectiveVotingBarrier) getOptions() []string {
 	options := make([]string, 0)
 	options = append(options, "No One")
@@ -65,16 +73,16 @@ func (dvb DetectiveVotingBarrier) getOptions() []string {
 	return options
 }
 
-func (dvb DetectiveVotingBarrier) executeOption(option string) {
+func (dvb DetectiveVotingBarrier) executeOption(option []string) {
 	for i := range mafiaUsers {
-		if mafiaUsers[i].Character.Name == option {
+		if mafiaUsers[i].Character.Name == option[0] {
 			state := "weird"
 			if mafiaUsers[i].Role.getTeam() == TEAM_MAFIA {
 				state = "shady"
 			} else if mafiaUsers[i].Role.getTeam() == TEAM_VILLAGER {
 				state = "good"
 			}
-			sendPrivateInfoMessage(option+" seems to be "+state+"!", CHAT_ALL, 1, dvb.Name)
+			sendPrivateInfoMessage(option[0]+" seems to be "+state+"!", CHAT_ALL, 1, dvb.Name)
 		}
 	}
 }

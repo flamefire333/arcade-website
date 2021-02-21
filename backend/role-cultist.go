@@ -31,8 +31,12 @@ func (cultist CultistRole) getNightChatGroup() int {
 
 func (cultist CultistRole) getVotingBarriers() []VotingBarrierInterface {
 	barriers := make([]VotingBarrierInterface, 0, 1)
-	emptyMap := make(map[string]string, 0)
-	barriers = append(barriers, CultistVotingBarrier{Base: VotingBarrierBase{Votes: emptyMap, ID: GetNextVotingBarrierID()}})
+	barrierIDs := make([]int, 0)
+	barrierID := GetNextVotingBarrierID()
+	barrierIDs = append(barrierIDs, barrierID)
+	fields := make([]VoteField, 0)
+	fields = append(fields, VoteField{Type: "option", Options: getStandardVotingOptions(), BarrierID: barrierID})
+	barriers = append(barriers, CultistVotingBarrier{Base: VotingBarrierBase{Votes: getStandardBaseVotes(barrierIDs), Fields: fields}})
 	return barriers
 }
 
@@ -62,6 +66,10 @@ func (cvb CultistVotingBarrier) getVoters() []string {
 	return voters
 }
 
+func (cvb CultistVotingBarrier) getTitle() string {
+	return "Cultist Vote"
+}
+
 func (cvb CultistVotingBarrier) getOptions() []string {
 	options := make([]string, 0)
 	options = append(options, "No One")
@@ -73,8 +81,8 @@ func (cvb CultistVotingBarrier) getOptions() []string {
 	return options
 }
 
-func (cvb CultistVotingBarrier) executeOption(option string) {
-	setPlayerRoleByNameFromVote(option, ROLE_CULTIST, cvb)
+func (cvb CultistVotingBarrier) executeOption(option []string) {
+	setPlayerRoleByNameFromVote(option[0], ROLE_CULTIST, cvb)
 }
 
 func (cvb CultistVotingBarrier) getBase() *VotingBarrierBase {

@@ -28,8 +28,12 @@ func (mafia MafiaRole) getNightChatGroup() int {
 
 func (mafia MafiaRole) getVotingBarriers() []VotingBarrierInterface {
 	barriers := make([]VotingBarrierInterface, 0, 1)
-	emptyMap := make(map[string]string, 0)
-	barriers = append(barriers, MafiaVotingBarrier{Base: VotingBarrierBase{Votes: emptyMap, ID: GetNextVotingBarrierID()}})
+	barrierIDs := make([]int, 0)
+	barrierID := GetNextVotingBarrierID()
+	barrierIDs = append(barrierIDs, barrierID)
+	fields := make([]VoteField, 0)
+	fields = append(fields, VoteField{Type: "option", Options: getStandardVotingOptions(), BarrierID: barrierID})
+	barriers = append(barriers, MafiaVotingBarrier{Base: VotingBarrierBase{Votes: getStandardBaseVotes(barrierIDs), Fields: fields}})
 	return barriers
 }
 
@@ -49,6 +53,10 @@ func (mvb MafiaVotingBarrier) getVoters() []string {
 	return voters
 }
 
+func (mvb MafiaVotingBarrier) getTitle() string {
+	return "Maifa Vote"
+}
+
 func (mvb MafiaVotingBarrier) getOptions() []string {
 	options := make([]string, 0)
 	options = append(options, "No One")
@@ -60,8 +68,8 @@ func (mvb MafiaVotingBarrier) getOptions() []string {
 	return options
 }
 
-func (mvb MafiaVotingBarrier) executeOption(option string) {
-	killPlayerByNameFromVote(option, mvb)
+func (mvb MafiaVotingBarrier) executeOption(option []string) {
+	killPlayerByNameFromVote(option[0], mvb, 1)
 }
 
 func (mvb MafiaVotingBarrier) getBase() *VotingBarrierBase {
