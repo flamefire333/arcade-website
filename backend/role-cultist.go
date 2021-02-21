@@ -52,6 +52,10 @@ func (cultist CultistRole) initialize() {
 	sendPrivateInfoMessage("You are the cultist leader!", CHAT_ALL, 1, mafiaUsers[cultistIDs[0]].Character.Name)
 }
 
+func (cultist CultistRole) getSelfShowRoleID() int {
+	return ROLE_CULTIST
+}
+
 type CultistVotingBarrier struct {
 	Base VotingBarrierBase
 }

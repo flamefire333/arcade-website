@@ -39,6 +39,10 @@ func (mafia MafiaRole) getVotingBarriers() []VotingBarrierInterface {
 
 func (mafia MafiaRole) initialize() {}
 
+func (mafia MafiaRole) getSelfShowRoleID() int {
+	return ROLE_MAFIA
+}
+
 type MafiaVotingBarrier struct {
 	Base VotingBarrierBase
 }

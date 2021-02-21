@@ -38,3 +38,7 @@ func (bomb BombRole) initialize() {
 		}
 	}
 }
+
+func (bomb BombRole) getSelfShowRoleID() int {
+	return ROLE_BOMB
+}

@@ -295,7 +295,10 @@ func getMafiaStatus(name string) MafiaStatus {
 	for _, user := range mafiaUsers {
 		character := user.Character
 		roleToShow := -1
-		if !user.Alive || user.Name == name {
+		if user.Name == name {
+			roleToShow = user.Role.getSelfShowRoleID()
+		}
+		if !user.Alive {
 			roleToShow = user.Role.getRoleID()
 		}
 		characters = append(characters, ActiveCharacter{Name: character.Name, Avatar: character.Avatar, Alive: user.Alive, RoleID: roleToShow, ID: 0})
@@ -474,10 +477,13 @@ func mainMafiaLogic() {
 					barrier.executeOption(option)
 				}
 			}
-			if CurrentGameInfo.Day {
-				setGameToNight()
-			} else {
-				setGameToDay()
+			// In case one of the barrier's executing caused the game to end (e.g. Day Voting killing a jester for a jester win)
+			if CurrentGameInfo.Started {
+				if CurrentGameInfo.Day {
+					setGameToNight()
+				} else {
+					setGameToDay()
+				}
 			}
 			clearMafiaStatusCache()
 		}

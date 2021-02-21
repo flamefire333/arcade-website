@@ -88,3 +88,23 @@ func (curse VoodooCursedTrait) onDeathByPlayerAction(killer *MafiaUser, myself *
 func (curse VoodooCursedTrait) shouldKeepOnNightChange() bool {
 	return false
 }
+
+type JesterTrait struct{}
+
+func (jester JesterTrait) messageConvert(message string, myself *MafiaUser) string {
+	return message
+}
+
+func (jester JesterTrait) onDeathByVote(barrier VotingBarrierInterface, myself *MafiaUser, phaseMod int) {
+	switch barrier.(type) {
+	case DayVotingBarrier:
+		endGame("The jester " + myself.Character.Name + " has won!")
+	}
+}
+
+func (jester JesterTrait) onDeathByPlayerAction(killer *MafiaUser, myself *MafiaUser, phaseMod int) {
+}
+
+func (jester JesterTrait) shouldKeepOnNightChange() bool {
+	return true
+}

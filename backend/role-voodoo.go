@@ -45,6 +45,10 @@ func (voodoo VoodooRole) getVotingBarriers() []VotingBarrierInterface {
 
 func (voodoo VoodooRole) initialize() {}
 
+func (voodoo VoodooRole) getSelfShowRoleID() int {
+	return ROLE_VOODOO
+}
+
 type VoodooVotingBarrier struct {
 	Base VotingBarrierBase
 	Name string

@@ -43,6 +43,10 @@ func (detective DetectiveRole) getVotingBarriers() []VotingBarrierInterface {
 
 func (detective DetectiveRole) initialize() {}
 
+func (detective DetectiveRole) getSelfShowRoleID() int {
+	return ROLE_DETECTIVE
+}
+
 type DetectiveVotingBarrier struct {
 	Base VotingBarrierBase
 	Name string

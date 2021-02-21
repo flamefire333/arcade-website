@@ -25,3 +25,7 @@
   width: 0px;
   height: 0px;
 }
+
+.alignOnRight {
+  right: -30px;
+}

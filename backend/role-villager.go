@@ -32,3 +32,7 @@ func (villager VillagerRole) getNightChatGroup() int {
 }
 
 func (villager VillagerRole) initialize() {}
+
+func (villager VillagerRole) getSelfShowRoleID() int {
+	return ROLE_VILLAGER
+}
