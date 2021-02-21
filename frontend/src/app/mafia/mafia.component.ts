@@ -304,7 +304,7 @@ export class MafiaComponent implements OnInit {
     if (!!this.myCharacterAvatar && this.started) {
       return this.myCharacterAvatar;
     } else {
-      return 'https://cdn.discordapp.com/emojis/622202821940609065.png?v=1';
+      return '';
     }
   }
 

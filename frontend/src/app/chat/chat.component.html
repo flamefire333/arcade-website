@@ -20,6 +20,14 @@
         </tr>
       </table>
     </div>
-    <input matInput id="chatEntry" class="chat-input" type="text" (keyup)="ChatOnKey($event)" #chatEntry>
+    <mat-form-field class="chat-input" appearance="fill">
+      <mat-label>Send Message...</mat-label>
+      <input matInput type="text" (keyup)="ChatOnKey($event)" [matAutocomplete]="auto" #chatEntry>
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let emote of this.filteredEmotes" [value]="getAutocompletedMessage(emote)" (click)="this.filteredEmotes = []">
+          <img class="emote" [src]="this.emoteMap.get(emote)">{{emote}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
   </div>
 </div>

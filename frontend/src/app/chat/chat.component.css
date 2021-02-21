@@ -1,8 +1,8 @@
 .chat-table {
   width: 60vw;
   overflow-y: scroll;
-  max-height: 75vh;
-  height: 80vh;
+  max-height: 70vh;
+  height: 70vh;
   display:flex;
   flex-direction: column-reverse;
 }
@@ -41,9 +41,6 @@ body {
 
 .chat-input {
   width: 100%;
-  height: 20px;
-  background-color: #444444;
-  color: #ffffff;
   position: absolute;
   bottom: 0px;
 }
@@ -77,4 +74,8 @@ body {
 .chat-table::-webkit-scrollbar-thumb {
   background-color: #666666;    /* color of the scroll thumb */
   border-radius: 20px;       /* roundness of the scroll thumb */
+}
+
+.emote-input {
+  display: none;
 }
