@@ -1,6 +1,7 @@
 package main
 
 import (
+	"arcade-website/character"
 	"arcade-website/chat"
 	"arcade-website/mafia"
 	"arcade-website/roles"
@@ -65,6 +66,7 @@ func main() {
 	r := mux.NewRouter()
 	rand.Seed(time.Now().UnixNano())
 	roles.InitRoles()
+	character.SetupCharacters()
 	go chat.ChatRequestHandler()
 	go mafia.MafiaRequestHandler()
 	go mafia.GameRunner()

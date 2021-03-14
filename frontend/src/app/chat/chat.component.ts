@@ -285,26 +285,26 @@ export class ChatComponent implements OnInit {
   tryToFindDefaultAvatar(): void {
     const name = this.characterName;
     const options: ([string[], string])[] = [
-      [['jake'], 'https://cdn.discordapp.com/avatars/314239819767218177/5dc1fc943dcd98aa4473f705fef490c8.png?size=256'],
-      [['j.*lian'], 'https://cdn.discordapp.com/avatars/244248142944534528/bd1dd8f71b74dcf00ec5e76a8b03471c.png?size=256'],
-      [['zy.*'], 'https://cdn.discordapp.com/avatars/262390464202801152/7bc4bb160466cd1846319bcab066fb85.png?size=256'],
+      [['jake'], 'https://cdn.discordapp.com/attachments/738860771731308609/820533784918097971/unknown.png'],
+      [['j.*lian'], 'https://media.discordapp.net/attachments/738860771731308609/820534137806127104/unknown.png'],
+      [['zy.*'], 'https://cdn.discordapp.com/attachments/738860771731308609/820534373156651038/344e722ea7f880fad5b0bc1d2855615c.png'],
       [['sh.*ve.*', 'soup.*', 'wooloo.*'], 'https://media.discordapp.net/attachments/738860771731308609/813204242181259264/unknown.png'],
-      [['dino.*', 'cow.*'], 'https://cdn.discordapp.com/avatars/168166430473191424/a_4840637c930c4edbfa5fa87b79d572d3.gif?size=256'],
-      [['may.*', '.*union.*'], 'https://cdn.discordapp.com/avatars/314240091591540749/429e43eceb35ccd104a6bfac9c25c27d.png?size=256'],
-      [['beep.*'], 'https://cdn.discordapp.com/avatars/330387628203442186/2735a3b1b08de9bc82601c782e02816c.png?size=256'],
-      [['quag.*'], 'https://cdn.discordapp.com/avatars/396159520226672642/4c9a49e2e9dd4b81a122f765a54c97b7.png?size=256'],
-      [['nik.*'], 'https://cdn.discordapp.com/avatars/738981920909819906/95a8bfe9120413112426b89d593afbfd.png?size=256'],
-      [['lio.*'], 'https://cdn.discordapp.com/avatars/329048786787631104/09a6b96fa70cc637e7a808b31aacc67b.png?size=256'],
-      [['saj.*'], 'https://cdn.discordapp.com/avatars/372112823871995904/4abad0b6fdcb8166e4b189bf60ab6c61.png?size=256'],
-      [['.*hsc.*', 'tae.*', '.*ide', '.*ene', '.*ase', '.*ine', '.*ylene'], 'https://cdn.discordapp.com/avatars/641557309117693953/0a5381ef613ab508ada1872f28332789.png?size=256'],
+      [['dino.*', 'cow.*'], 'https://cdn.discordapp.com/attachments/738860771731308609/820534518297001994/5304162d8e15b5f3865eda80dbab8495.png'],
+      [['may.*', '.*union.*'], 'https://media.discordapp.net/attachments/532394137970933768/820512946085822494/poke_RedYellowBlueGreen.jpg'],
+      [['beep.*'], 'https://media.discordapp.net/attachments/738860771731308609/820534639634153482/3dd6ab13659e58c46296636248a61ebf.png'],
+      [['quag.*'], 'https://cdn.discordapp.com/attachments/738860771731308609/820512895569231902/4c9a49e2e9dd4b81a122f765a54c97b7.png'],
+      [['nik.*'], 'https://media.discordapp.net/attachments/738860771731308609/820534819011821568/e2bab855d641dfcb2f70275041f3c19a.png'],
+      [['lio.*'], 'https://media.discordapp.net/attachments/738860771731308609/820534983847313438/a_05915a54b6c6a08811aac838c551713b.png'],
+      [['saj.*'], 'https://cdn.discordapp.com/attachments/738860771731308609/820535280926326784/4abad0b6fdcb8166e4b189bf60ab6c61.png'],
+      [['.*hsc.*', 'tae.*', '.*ide', '.*ene', '.*ase', '.*ine', '.*ylene'], 'https://media.discordapp.net/attachments/738860771731308609/820535396458692668/4fb577085d18410eff4dd8d59240ca43.png'],
       [['.*mika.*'], 'https://cdn.discordapp.com/attachments/738860771731308609/813206571029889034/unknown.png'],
       [['.*rj.*'], 'https://media.discordapp.net/attachments/738860771731308609/813207754139369522/unknown.png'],
-      [['cl.*', '.*atsumu.*'], 'https://cdn.discordapp.com/avatars/319610435647307777/3292750b1d7ae1a21032644c73db30f5.png?size=256'],
-      [['.*jade.*', '.*hockey.*'], 'https://cdn.discordapp.com/avatars/223929881971523584/05bc9fe91b17b7d5624621afc4757461.png?size=256'],
+      [['cl.*', '.*atsumu.*'], 'https://media.discordapp.net/attachments/738860771731308609/820535593301835786/1f8593ae86120a1cea9daf4496b52829.png'],
+      [['.*jade.*', '.*hockey.*'], 'https://media.discordapp.net/attachments/738860771731308609/820535723534581780/05bc9fe91b17b7d5624621afc4757461.png'],
       [['.*earthy.*'], 'https://media.discordapp.net/attachments/738860771731308609/813208742820446268/unknown.png'],
-      [['.*kris.*'], 'https://cdn.discordapp.com/avatars/211989880752963586/9ec70b606e5947be37d47a0aa542c487.png?size=256'],
-      [['.*lance.*', '.*hose.*'], 'https://cdn.discordapp.com/avatars/498798183309115402/ac735c0e617193cbfa883fb62d93e141.png?size=256'],
-      [['.*zhou.*'], 'https://cdn.discordapp.com/avatars/402527014721945611/ca3832d3f1ff7b3e162d7dd5092e649a.png?size=256']
+      [['.*kris.*'], 'https://cdn.discordapp.com/attachments/738860771731308609/820536334845476894/80356e726fb6bf0be4917c669ed423d3.png'],
+      [['.*lance.*', '.*hose.*'], 'https://media.discordapp.net/attachments/738860771731308609/820536189474963476/unknown.png'],
+      [['.*zhou.*'], 'https://media.discordapp.net/attachments/738860771731308609/820536478739464242/6b9473bb4c378e5562f8cbb5fc9e6ed1.png']
     ];
     options.forEach(option => {
       option[0].forEach(possibleName => {
