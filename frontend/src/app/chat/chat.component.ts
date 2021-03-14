@@ -303,7 +303,7 @@ export class ChatComponent implements OnInit {
       [['.*jade.*', '.*hockey.*'], 'https://media.discordapp.net/attachments/738860771731308609/820535723534581780/05bc9fe91b17b7d5624621afc4757461.png'],
       [['.*earthy.*'], 'https://media.discordapp.net/attachments/738860771731308609/813208742820446268/unknown.png'],
       [['.*kris.*'], 'https://cdn.discordapp.com/attachments/738860771731308609/820536334845476894/80356e726fb6bf0be4917c669ed423d3.png'],
-      [['.*lance.*', '.*hose.*'], 'https://media.discordapp.net/attachments/738860771731308609/820536189474963476/unknown.png'],
+      [['.*lance.*', '.*hose.*'], 'https://media.discordapp.net/attachments/738860771731308609/820576990490918952/5we-GTac_400x400.png'],
       [['.*zhou.*'], 'https://media.discordapp.net/attachments/738860771731308609/820536478739464242/6b9473bb4c378e5562f8cbb5fc9e6ed1.png']
     ];
     options.forEach(option => {
