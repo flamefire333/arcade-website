@@ -1,6 +1,9 @@
 package main
 
 import (
+	"arcade-website/chat"
+	"arcade-website/mafia"
+	"arcade-website/roles"
 	"log"
 	"math/rand"
 	"net/http"
@@ -61,13 +64,13 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 	rand.Seed(time.Now().UnixNano())
-	initRoles()
-	go chatRequestHandler()
-	go mafiaRequestHandler()
-	go GameRunner()
+	roles.InitRoles()
+	go chat.ChatRequestHandler()
+	go mafia.MafiaRequestHandler()
+	go mafia.GameRunner()
 
-	addChatHandlers(r)
-	addMafiaHandlers(r)
+	chat.AddChatHandlers(r)
+	mafia.AddMafiaHandlers(r)
 
 	spa := spaHandler{staticPath: "/frontend", indexPath: "index.html"}
 	r.PathPrefix("/").Handler(spa)

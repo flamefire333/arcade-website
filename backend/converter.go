@@ -1,5 +1,9 @@
 package main
 
-func convertMessage(user MafiaUser, message string) string {
+import (
+	"arcade-website/shared"
+)
+
+func convertMessage(user shared.MafiaUser, message string) string {
 	return message
 }
