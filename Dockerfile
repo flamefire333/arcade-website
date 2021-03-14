@@ -1,9 +1,6 @@
 FROM node:12.7-alpine AS buildng
 WORKDIR /usr/src/app
-COPY frontend/ .
-RUN npm install
-RUN npm run build
-RUN ls
+COPY frontend/dist ./dist
 
 FROM golang:alpine AS buildgo
 RUN apk --no-cache add gcc g++ make git
