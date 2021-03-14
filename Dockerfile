@@ -3,6 +3,7 @@ WORKDIR /usr/src/app
 COPY frontend/ .
 RUN npm install
 RUN npm run build
+RUN ls
 
 FROM golang:alpine AS buildgo
 RUN apk --no-cache add gcc g++ make git
