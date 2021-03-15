@@ -16,6 +16,7 @@ var AllCharacters []Character
 
 func SetupCharacters() {
 	Conn, err := database.GetDBConn()
+	defer Conn.Close()
 	if err != nil {
 		log.Printf("Getting DB for Character Selected failed %+v\n", err)
 		return
