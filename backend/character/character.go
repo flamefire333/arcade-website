@@ -15,7 +15,12 @@ type Character struct {
 var AllCharacters []Character
 
 func SetupCharacters() {
-	rows, err := database.Conn.Query("SELECT id, name, avatar, group_id FROM characters")
+	Conn, err := database.GetDBConn()
+	if err != nil {
+		log.Printf("Getting DB for Character Selected failed %+v\n", err)
+		return
+	}
+	rows, err := Conn.Query("SELECT id, name, avatar, group_id FROM characters")
 	if err != nil {
 		log.Printf("Character SELECT failed %+v\n", err)
 		return
@@ -27,4 +32,5 @@ func SetupCharacters() {
 		characters = append(characters, c)
 	}
 	AllCharacters = characters
+	log.Printf("Characters Loaded: %+v\n", AllCharacters)
 }
