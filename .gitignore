@@ -1,3 +1,4 @@
 frontend/.idea
 frontend/node_modules
 frontend/e2e
+go-app-compose.yaml
