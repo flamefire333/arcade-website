@@ -63,6 +63,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	time.Sleep(20 * time.Second)
 	r := mux.NewRouter()
 	rand.Seed(time.Now().UnixNano())
 	roles.InitRoles()
